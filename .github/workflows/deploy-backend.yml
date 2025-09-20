@@ -1,0 +1,73 @@
+name: Deploy Backend to EC2
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup SSH
+      uses: webfactory/ssh-agent@v0.7.0
+      with:
+        ssh-private-key: ${{ secrets.EC2_SSH_KEY }}
+        
+    - name: Add EC2 to known hosts
+      run: |
+        ssh-keyscan -H ${{ secrets.EC2_HOST }} >> ~/.ssh/known_hosts
+        
+    - name: Deploy to EC2
+      run: |
+        ssh ${{ secrets.EC2_USERNAME }}@${{ secrets.EC2_HOST }} '
+          cd /opt/arryn-backend
+          
+          # Clone o actualizar repositorio
+          if [ ! -d ".git" ]; then
+            git clone https://github.com/ARRYN-PI2/pi2-backend.git .
+            git checkout main
+          else
+            git fetch origin
+            git checkout main
+            git pull origin main
+          fi
+          
+          # Crear archivos de configuración si no existen
+          if [ ! -f "docker-compose.yml" ]; then
+            cat > docker-compose.yml << EOF
+          version: "3.8"
+          services:
+            backend:
+              build: .
+              ports:
+                - "8000:8000"
+              environment:
+                - MONGODB_URL=${{ secrets.MONGODB_URL }}
+              restart: unless-stopped
+          EOF
+          fi
+          
+          if [ ! -f "Dockerfile" ]; then
+            cat > Dockerfile << EOF
+          FROM python:3.9-slim
+          WORKDIR /app
+          COPY requirements.txt .
+          RUN pip install --no-cache-dir -r requirements.txt
+          COPY . .
+          EXPOSE 8000
+          CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+          EOF
+          fi
+          
+          # Deploy
+          ./deploy.sh
+        '
+        
+    - name: Health Check
+      run: |
+        sleep 15
+        curl -f http://${{ secrets.EC2_HOST }}:8000/health
