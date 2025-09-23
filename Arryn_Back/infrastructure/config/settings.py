@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'Arryn_Back.infrastructure.api',  # ruta completa
+    'corsheaders',
 ]
 
 
@@ -58,7 +59,16 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
+    'django.middleware.common.CommonMiddleware'
 ]
+
+CORS_ALLOWED_ORIGINS = [
+    #"http://localhost:5173", Poner aca Frontend  
+    "http://127.0.0.1:5173"
+]
+
+
 
 ROOT_URLCONF = 'Arryn_Back.infrastructure.config.urls'
 
@@ -91,7 +101,7 @@ DATABASES = {
         "ENGINE": "django.db.backends.postgresql",
         "NAME": "postgres",
         "USER": "postgres",
-        "PASSWORD": "hola1234",
+        "PASSWORD": "root",
         "HOST": "localhost",  # o IP del servidor
         "PORT": "5432",
     }
