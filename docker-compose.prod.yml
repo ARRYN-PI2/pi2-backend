@@ -1,0 +1,135 @@
+version: '3.8'
+
+services:
+  # Backend Django - Producción
+  arryn-backend:
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    container_name: arryn-backend-prod
+    expose:
+      - "8000"
+    environment:
+      - DEBUG=False
+      - SECRET_KEY=${SECRET_KEY}
+      - ALLOWED_HOSTS=${ALLOWED_HOSTS}
+      - MONGO_HOST=mongodb
+      - MONGO_PORT=27017
+      - MONGO_DB_NAME=${MONGO_DB_NAME}
+      - MONGO_CONNECTION_TIMEOUT=10000
+      - CORS_ALLOWED_ORIGINS=${CORS_ALLOWED_ORIGINS}
+      - CACHE_BACKEND=django_redis.cache.RedisCache
+      - CACHE_LOCATION=redis://redis:6379/1
+      - CACHE_TIMEOUT=600
+      - RATE_LIMIT_REQUESTS=1000
+      - RATE_LIMIT_WINDOW=60
+      - LOG_LEVEL=WARNING
+      - GUNICORN_WORKERS=4
+      - GUNICORN_WORKER_CLASS=gevent
+      - GUNICORN_WORKER_CONNECTIONS=1000
+      - DJANGO_SUPERUSER_USERNAME=${DJANGO_SUPERUSER_USERNAME}
+      - DJANGO_SUPERUSER_EMAIL=${DJANGO_SUPERUSER_EMAIL}
+      - DJANGO_SUPERUSER_PASSWORD=${DJANGO_SUPERUSER_PASSWORD}
+    volumes:
+      - ./logs:/app/logs
+      - static_volume:/app/static
+      - media_volume:/app/media
+    depends_on:
+      - mongodb
+      - redis
+    networks:
+      - arryn-network
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+          cpus: '1.0'
+        reservations:
+          memory: 512M
+          cpus: '0.5'
+
+  # MongoDB - Producción
+  mongodb:
+    image: mongo:7
+    container_name: arryn-mongodb-prod
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=${MONGO_ROOT_USERNAME}
+      - MONGO_INITDB_ROOT_PASSWORD=${MONGO_ROOT_PASSWORD}
+      - MONGO_INITDB_DATABASE=${MONGO_DB_NAME}
+    volumes:
+      - mongodb_data:/data/db
+      - mongodb_config:/data/configdb
+      - ./scripts/init-mongo.js:/docker-entrypoint-initdb.d/init-mongo.js:ro
+    networks:
+      - arryn-network
+    restart: unless-stopped
+    command: mongod --auth
+
+  # Redis - Producción
+  redis:
+    image: redis:7-alpine
+    container_name: arryn-redis-prod
+    command: redis-server --appendonly yes --requirepass ${REDIS_PASSWORD}
+    volumes:
+      - redis_data:/data
+    networks:
+      - arryn-network
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+          cpus: '0.5'
+
+  # Nginx - Producción
+  nginx:
+    image: nginx:alpine
+    container_name: arryn-nginx-prod
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/ssl:/etc/nginx/ssl:ro
+      - static_volume:/var/www/static:ro
+      - media_volume:/var/www/media:ro
+    depends_on:
+      - arryn-backend
+    networks:
+      - arryn-network
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 128M
+          cpus: '0.5'
+
+  # Watchtower para actualizaciones automáticas (opcional)
+  watchtower:
+    image: containrrr/watchtower
+    container_name: arryn-watchtower
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      - WATCHTOWER_CLEANUP=true
+      - WATCHTOWER_POLL_INTERVAL=86400  # 24 horas
+    restart: unless-stopped
+    profiles:
+      - auto-update
+
+volumes:
+  mongodb_data:
+    driver: local
+  mongodb_config:
+    driver: local
+  redis_data:
+    driver: local
+  static_volume:
+    driver: local
+  media_volume:
+    driver: local
+
+networks:
+  arryn-network:
+    driver: bridge
