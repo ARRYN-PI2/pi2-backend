@@ -27,11 +27,12 @@ jobs:
          git clone https://github.com/ARRYN-PI2/pi2-backend.git . && \
          git checkout main"
          
-    - name: Create Docker files
+    - name: Setup environment from .env.prod
       run: |
         ssh -o StrictHostKeyChecking=no ${{ secrets.EC2_USERNAME }}@${{ secrets.EC2_HOST }} \
         "cd /opt/arryn-backend && \
-         echo 'MONGODB_URL=${{ secrets.MONGODB_URL }}' > .env && \
+         cp .env.prod .env && \
+         echo 'MONGODB_URL=${{ secrets.MONGODB_URL }}' >> .env && \
          echo 'SECRET_KEY=${{ secrets.DJANGO_SECRET_KEY }}' >> .env && \
          echo 'DJANGO_SUPERUSER_PASSWORD=${{ secrets.DJANGO_SUPERUSER_PASSWORD }}' >> .env"
          
@@ -49,23 +50,6 @@ jobs:
             env_file:
               - .env
             restart: unless-stopped
-        EOF"
-        
-    - name: Create Dockerfile
-      run: |
-        ssh -o StrictHostKeyChecking=no ${{ secrets.EC2_USERNAME }}@${{ secrets.EC2_HOST }} \
-        "cd /opt/arryn-backend && \
-         cat > Dockerfile << 'EOF'
-        FROM python:3.11-slim
-        WORKDIR /app
-        RUN apt-get update && apt-get install -y gcc && rm -rf /var/lib/apt/lists/*
-        COPY requirements.txt .
-        RUN pip install --no-cache-dir -r requirements.txt
-        COPY . .
-        RUN mkdir -p /app/static
-        RUN python manage.py collectstatic --noinput || true
-        EXPOSE 8000
-        CMD [\"python\", \"manage.py\", \"runserver\", \"0.0.0.0:8000\"]
         EOF"
         
     - name: Deploy with Docker
