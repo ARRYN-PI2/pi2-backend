@@ -13,8 +13,16 @@ try:
     MONGO_PORT = int(os.getenv("MONGO_PORT", 27017))
     MONGO_DB_NAME = os.getenv("MONGO_DB_NAME", "arryn_products_db")
     MONGO_TIMEOUT = int(os.getenv("MONGO_CONNECTION_TIMEOUT", 5000))
-    
-    client = MongoClient(f"mongodb://{MONGO_HOST}:{MONGO_PORT}/", serverSelectionTimeoutMS=MONGO_TIMEOUT)
+    MONGO_USER = os.getenv("MONGO_USER")
+    MONGO_PASSWORD = os.getenv("MONGO_PASSWORD")
+    MONGO_AUTH_DB = os.getenv("MONGO_AUTH_DB", MONGO_DB_NAME)
+
+    if MONGO_USER and MONGO_PASSWORD:
+        mongo_uri = f"mongodb://{MONGO_USER}:{MONGO_PASSWORD}@{MONGO_HOST}:{MONGO_PORT}/{MONGO_AUTH_DB}"
+    else:
+        mongo_uri = f"mongodb://{MONGO_HOST}:{MONGO_PORT}/"
+
+    client = MongoClient(mongo_uri, serverSelectionTimeoutMS=MONGO_TIMEOUT)
     # Test de conexión
     client.admin.command('ping')
     db = client[MONGO_DB_NAME]
