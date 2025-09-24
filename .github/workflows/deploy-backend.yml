@@ -45,7 +45,7 @@ jobs:
                 - "8000:8000"
               environment:
                 - MONGODB_URL=${{ secrets.MONGODB_URL }}
-                - DJANGO_SETTINGS_MODULE=arryn_backend.settings
+                - DJANGO_SETTINGS_MODULE=Arryn_Back.infrastructure.config.settings
               restart: unless-stopped
           COMPOSE_EOF
             
