@@ -32,7 +32,8 @@ jobs:
         ssh -o StrictHostKeyChecking=no ${{ secrets.EC2_USERNAME }}@${{ secrets.EC2_HOST }} \
         "cd /opt/arryn-backend && \
          echo 'MONGODB_URL=${{ secrets.MONGODB_URL }}' > .env && \
-         echo 'DJANGO_SETTINGS_MODULE=arryn_backend.settings' >> .env"
+         echo 'SECRET_KEY=${{ secrets.DJANGO_SECRET_KEY }}' >> .env && \
+         echo 'DJANGO_SUPERUSER_PASSWORD=${{ secrets.DJANGO_SUPERUSER_PASSWORD }}' >> .env"
          
     - name: Create docker-compose.yml
       run: |
