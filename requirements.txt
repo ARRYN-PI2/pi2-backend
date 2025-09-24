@@ -1,5 +1,5 @@
 Django==5.2.5
 djangorestframework
-cors
+django-cors-headers
 pymongo
-psycopg2
+psycopg2-binary
