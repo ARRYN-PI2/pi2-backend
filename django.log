@@ -1,0 +1,83 @@
+INFO 2025-09-24 06:06:35,021 autoreload 20875 140244966649600 Watching for file changes with StatReloader
+INFO 2025-09-24 06:07:18,312 autoreload 20875 140244966649600 /home/raul/Documents/Pi2Camilo/Repositorios/pi2-backend/Arryn_Back/infrastructure/config/settings.py changed, reloading.
+INFO 2025-09-24 06:07:18,784 autoreload 21002 140429618110208 Watching for file changes with StatReloader
+INFO 2025-09-24 06:32:24,452 autoreload 23071 140194944777984 Watching for file changes with StatReloader
+INFO 2025-09-24 06:32:38,596 autoreload 23071 140194944777984 /home/raul/Documents/Pi2Camilo/Repositorios/pi2-backend/Arryn_Back/infrastructure/config/settings.py changed, reloading.
+INFO 2025-09-24 06:32:39,209 autoreload 23177 139903199575808 Watching for file changes with StatReloader
+INFO 2025-09-24 06:32:52,184 autoreload 23335 140210107072256 Watching for file changes with StatReloader
+INFO 2025-09-24 06:33:25,220 autoreload 23530 139723930414848 Watching for file changes with StatReloader
+INFO 2025-09-24 06:33:56,959 autoreload 23749 140566593969920 Watching for file changes with StatReloader
+ERROR 2025-09-24 06:34:02,540 log 23749 140565890987712 Internal Server Error: /api/best-prices/electronics/
+Traceback (most recent call last):
+  File "/home/raul/Documents/Pi2Camilo/Repositorios/pi2-backend/.venv/lib64/python3.13/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/raul/Documents/Pi2Camilo/Repositorios/pi2-backend/.venv/lib64/python3.13/site-packages/django/utils/deprecation.py", line 115, in __call__
+    if self.async_mode:
+       ^^^^^^^^^^^^^^^
+AttributeError: 'RateLimitMiddleware' object has no attribute 'async_mode'
+ERROR 2025-09-24 06:34:02,541 basehttp 23749 140565890987712 "GET /api/best-prices/electronics/?user_id=1&limit=3 HTTP/1.1" 500 21089
+INFO 2025-09-24 06:35:48,579 autoreload 23749 140566593969920 /home/raul/Documents/Pi2Camilo/Repositorios/pi2-backend/Arryn_Back/infrastructure/middleware/performance.py changed, reloading.
+INFO 2025-09-24 06:35:49,258 autoreload 23971 139717425135360 Watching for file changes with StatReloader
+INFO 2025-09-24 06:35:57,372 autoreload 23971 139717425135360 /home/raul/Documents/Pi2Camilo/Repositorios/pi2-backend/Arryn_Back/infrastructure/middleware/performance.py changed, reloading.
+INFO 2025-09-24 06:35:58,021 autoreload 24039 140474988416768 Watching for file changes with StatReloader
+INFO 2025-09-24 06:36:44,363 autoreload 24307 139837046570752 Watching for file changes with StatReloader
+INFO 2025-09-24 06:37:38,892 autoreload 24546 140639581077248 Watching for file changes with StatReloader
+INFO 2025-09-24 06:38:24,289 autoreload 24782 139967334219520 Watching for file changes with StatReloader
+INFO 2025-09-24 06:38:31,090 performance 24782 139966768207552 GET /api/best-prices/electronics/ - 0.002s - Status: 200
+INFO 2025-09-24 06:38:31,091 performance 24782 139966768207552 Cached response for /api/best-prices/electronics/
+INFO 2025-09-24 06:38:31,091 basehttp 24782 139966768207552 "GET /api/best-prices/electronics/?user_id=1&limit=3 HTTP/1.1" 200 995
+INFO 2025-09-24 06:38:39,764 performance 24782 139966768207552 GET /api/price-comparison/electronics/ - 0.003s - Status: 404
+WARNING 2025-09-24 06:38:39,764 log 24782 139966768207552 Not Found: /api/price-comparison/electronics/
+WARNING 2025-09-24 06:38:39,764 basehttp 24782 139966768207552 "GET /api/price-comparison/electronics/?product_name=smartphone&user_id=1 HTTP/1.1" 404 6254
+INFO 2025-09-24 06:38:46,434 performance 24782 139966768207552 GET /api/price-comparison/ - 0.000s - Status: 400
+WARNING 2025-09-24 06:38:46,434 log 24782 139966768207552 Bad Request: /api/price-comparison/
+WARNING 2025-09-24 06:38:46,435 basehttp 24782 139966768207552 "GET /api/price-comparison/?category=electronics&product_name=smartphone&user_id=1 HTTP/1.1" 400 45
+INFO 2025-09-24 06:38:51,946 performance 24782 139966768207552 GET /api/price-comparison/ - 0.000s - Status: 200
+INFO 2025-09-24 06:38:51,946 basehttp 24782 139966768207552 "GET /api/price-comparison/?category=electronics&product=smartphone&user_id=1 HTTP/1.1" 200 633
+INFO 2025-09-24 06:38:57,446 performance 24782 139966768207552 GET /api/ranked-offers/ - 0.001s - Status: 200
+INFO 2025-09-24 06:38:57,447 performance 24782 139966768207552 Cached response for /api/ranked-offers/
+INFO 2025-09-24 06:38:57,447 basehttp 24782 139966768207552 "GET /api/ranked-offers/?category=electronics&limit=5 HTTP/1.1" 200 2097
+INFO 2025-09-24 06:39:03,088 performance 24782 139966768207552 GET /api/trending-offers/ - 0.000s - Status: 200
+INFO 2025-09-24 06:39:03,088 performance 24782 139966768207552 Cached response for /api/trending-offers/
+INFO 2025-09-24 06:39:03,088 basehttp 24782 139966768207552 "GET /api/trending-offers/?limit=3 HTTP/1.1" 200 1282
+INFO 2025-09-24 06:39:09,007 performance 24782 139966768207552 GET /api/reports/store-comparison/ - 0.000s - Status: 200
+INFO 2025-09-24 06:39:09,007 performance 24782 139966768207552 Cached response for /api/reports/store-comparison/
+INFO 2025-09-24 06:39:09,007 basehttp 24782 139966768207552 "GET /api/reports/store-comparison/?period_days=30 HTTP/1.1" 200 753
+INFO 2025-09-24 06:39:15,746 performance 24782 139966768207552 GET /api/reports/price-analysis/electronics/ - 0.001s - Status: 200
+INFO 2025-09-24 06:39:15,746 performance 24782 139966768207552 Cached response for /api/reports/price-analysis/electronics/
+INFO 2025-09-24 06:39:15,746 basehttp 24782 139966768207552 "GET /api/reports/price-analysis/electronics/?period_days=7 HTTP/1.1" 200 547
+INFO 2025-09-24 06:39:28,731 performance 24782 139966768207552 Cache hit for /api/best-prices/electronics/
+INFO 2025-09-24 06:39:28,731 performance 24782 139966768207552 Cached response for /api/best-prices/electronics/
+INFO 2025-09-24 06:39:28,731 basehttp 24782 139966768207552 "GET /api/best-prices/electronics/?user_id=1&limit=3 HTTP/1.1" 200 1075
+INFO 2025-09-24 06:39:36,624 performance 24782 139966768207552 GET /api/trending-offers/ - 0.000s - Status: 200
+INFO 2025-09-24 06:39:36,624 performance 24782 139966768207552 Cached response for /api/trending-offers/
+INFO 2025-09-24 06:39:36,624 basehttp 24782 139966768207552 "GET /api/trending-offers/?limit=1 HTTP/1.1" 200 476
+INFO 2025-09-24 06:39:36,629 performance 24782 139966768207552 Cache hit for /api/trending-offers/
+INFO 2025-09-24 06:39:36,629 performance 24782 139966768207552 Cached response for /api/trending-offers/
+INFO 2025-09-24 06:39:36,630 basehttp 24782 139966768207552 "GET /api/trending-offers/?limit=1 HTTP/1.1" 200 514
+INFO 2025-09-24 06:39:36,634 performance 24782 139966768207552 Cache hit for /api/trending-offers/
+INFO 2025-09-24 06:39:36,634 performance 24782 139966768207552 Cached response for /api/trending-offers/
+INFO 2025-09-24 06:39:36,634 basehttp 24782 139966768207552 "GET /api/trending-offers/?limit=1 HTTP/1.1" 200 514
+INFO 2025-09-24 06:39:36,639 performance 24782 139966768207552 Cache hit for /api/trending-offers/
+INFO 2025-09-24 06:39:36,639 performance 24782 139966768207552 Cached response for /api/trending-offers/
+INFO 2025-09-24 06:39:36,639 basehttp 24782 139966768207552 "GET /api/trending-offers/?limit=1 HTTP/1.1" 200 514
+INFO 2025-09-24 06:39:36,643 performance 24782 139966768207552 Cache hit for /api/trending-offers/
+INFO 2025-09-24 06:39:36,644 performance 24782 139966768207552 Cached response for /api/trending-offers/
+INFO 2025-09-24 06:39:36,644 basehttp 24782 139966768207552 "GET /api/trending-offers/?limit=1 HTTP/1.1" 200 514
+INFO 2025-09-24 06:39:36,649 performance 24782 139966768207552 Cache hit for /api/trending-offers/
+INFO 2025-09-24 06:39:36,649 performance 24782 139966768207552 Cached response for /api/trending-offers/
+INFO 2025-09-24 06:39:36,650 basehttp 24782 139966768207552 "GET /api/trending-offers/?limit=1 HTTP/1.1" 200 514
+INFO 2025-09-24 06:39:36,653 performance 24782 139966768207552 Cache hit for /api/trending-offers/
+INFO 2025-09-24 06:39:36,654 performance 24782 139966768207552 Cached response for /api/trending-offers/
+INFO 2025-09-24 06:39:36,654 basehttp 24782 139966768207552 "GET /api/trending-offers/?limit=1 HTTP/1.1" 200 514
+INFO 2025-09-24 06:39:36,658 performance 24782 139966768207552 Cache hit for /api/trending-offers/
+INFO 2025-09-24 06:39:36,659 performance 24782 139966768207552 Cached response for /api/trending-offers/
+INFO 2025-09-24 06:39:36,659 basehttp 24782 139966768207552 "GET /api/trending-offers/?limit=1 HTTP/1.1" 200 514
+INFO 2025-09-24 06:39:36,664 performance 24782 139966768207552 Cache hit for /api/trending-offers/
+INFO 2025-09-24 06:39:36,664 performance 24782 139966768207552 Cached response for /api/trending-offers/
+INFO 2025-09-24 06:39:36,664 basehttp 24782 139966768207552 "GET /api/trending-offers/?limit=1 HTTP/1.1" 200 514
+INFO 2025-09-24 06:39:36,668 performance 24782 139966768207552 Cache hit for /api/trending-offers/
+INFO 2025-09-24 06:39:36,669 performance 24782 139966768207552 Cached response for /api/trending-offers/
+INFO 2025-09-24 06:39:36,669 basehttp 24782 139966768207552 "GET /api/trending-offers/?limit=1 HTTP/1.1" 200 514
+INFO 2025-09-24 06:40:57,184 autoreload 24782 139967334219520 /home/raul/Documents/Pi2Camilo/Repositorios/pi2-backend/Arryn_Back/infrastructure/api/views.py changed, reloading.
+INFO 2025-09-24 06:40:57,571 autoreload 25646 140017008070400 Watching for file changes with StatReloader

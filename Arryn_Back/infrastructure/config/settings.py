@@ -10,30 +10,45 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
+import os
 from pathlib import Path
+from dotenv import load_dotenv
 from pymongo import MongoClient
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+# Load environment variables
+env_path = BASE_DIR.parent.parent / '.env.dev'
+load_dotenv(env_path)
+
+# MongoDB Configuration from environment
 MONGO_DB = {
-    "NAME": "mi_db_mongo",
-    "HOST": "localhost",
-    "PORT": 27017,
+    "NAME": os.getenv("MONGO_DB_NAME", "arryn_products_db"),
+    "HOST": os.getenv("MONGO_HOST", "localhost"),
+    "PORT": int(os.getenv("MONGO_PORT", 27017)),
 }
 
-mongo_client = MongoClient(MONGO_DB["HOST"], MONGO_DB["PORT"])
-MONGO_DATABASE = mongo_client[MONGO_DB["NAME"]]
+try:
+    mongo_client = MongoClient(
+        MONGO_DB["HOST"], 
+        MONGO_DB["PORT"],
+        serverSelectionTimeoutMS=int(os.getenv("MONGO_CONNECTION_TIMEOUT", 5000))
+    )
+    MONGO_DATABASE = mongo_client[MONGO_DB["NAME"]]
+except Exception as e:
+    print(f"MongoDB connection warning: {e}")
+    MONGO_DATABASE = None
 
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-h1fb7!_l&5p9zj%qe!owaq!0yr&+ng3jm%^0m5p#7m4eaqq+yq'
+SECRET_KEY = os.getenv("SECRET_KEY", 'django-insecure-default-key-change-in-production')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.getenv("DEBUG", "True").lower() in ("true", "1", "yes")
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "localhost,127.0.0.1").split(",")
 
 
 # Application definition
@@ -46,11 +61,16 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
+    'corsheaders',
     'Arryn_Back.infrastructure.api',  # ruta completa
 ]
 
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
+    'Arryn_Back.infrastructure.middleware.performance.RateLimitMiddleware',
+    'Arryn_Back.infrastructure.middleware.performance.ResponseCacheMiddleware', 
+    'Arryn_Back.infrastructure.middleware.performance.RequestLoggingMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -59,6 +79,10 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+
+CORS_ALLOWED_ORIGINS = os.getenv("CORS_ALLOWED_ORIGINS", "http://127.0.0.1:5173").split(",")
+
+
 
 ROOT_URLCONF = 'Arryn_Back.infrastructure.config.urls'
 
@@ -87,13 +111,9 @@ WSGI_APPLICATION = 'Arryn_Back.infrastructure.config.wsgi.application'
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
 DATABASES = {
-  "default": {
-        "ENGINE": "django.db.backends.postgresql",
-        "NAME": "postgres",
-        "USER": "postgres",
-        "PASSWORD": "hola1234",
-        "HOST": "localhost",  # o IP del servidor
-        "PORT": "5432",
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
 
@@ -139,3 +159,59 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# Configuración para manejo de concurrencia alta
+CACHES = {
+    'default': {
+        'BACKEND': os.getenv("CACHE_BACKEND", 'django.core.cache.backends.locmem.LocMemCache'),
+        'LOCATION': os.getenv("CACHE_LOCATION", 'arryn-cache'),
+        'TIMEOUT': int(os.getenv("CACHE_TIMEOUT", 300)),  # 5 minutos por defecto
+        'OPTIONS': {
+            'MAX_ENTRIES': int(os.getenv("CACHE_MAX_ENTRIES", 1000)),
+        }
+    }
+}
+
+# Session configuration para alta concurrencia
+SESSION_ENGINE = 'django.contrib.sessions.backends.cache'
+SESSION_CACHE_ALIAS = 'default'
+
+# Database connection configuration para SQLite
+# (SQLite no soporta connection pooling como PostgreSQL)
+
+# Configuración de logging para monitoreo
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            'format': '{levelname} {asctime} {module} {process:d} {thread:d} {message}',
+            'style': '{',
+        },
+    },
+    'handlers': {
+        'file': {
+            'level': os.getenv("LOG_LEVEL", "INFO"),
+            'class': 'logging.FileHandler',
+            'filename': os.getenv("LOG_FILE", "django.log"),
+            'formatter': 'verbose',
+        },
+        'console': {
+            'level': os.getenv("LOG_LEVEL", "INFO"),
+            'class': 'logging.StreamHandler',
+            'formatter': 'verbose',
+        },
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['file', 'console'],
+            'level': os.getenv("LOG_LEVEL", "INFO"),
+            'propagate': True,
+        },
+        'arryn': {
+            'handlers': ['file', 'console'],
+            'level': os.getenv("LOG_LEVEL", "INFO"),
+            'propagate': True,
+        },
+    },
+}

@@ -1,23 +1,28 @@
-"""
-URL configuration for ArrynBack project.
-
-The `urlpatterns` list routes URLs to views. For more information please see:
-    https://docs.djangoproject.com/en/5.2/topics/http/urls/
-Examples:
-Function views
-    1. Add an import:  from my_app import views
-    2. Add a URL to urlpatterns:  path('', views.home, name='home')
-Class-based views
-    1. Add an import:  from other_app.views import Home
-    2. Add a URL to urlpatterns:  path('', Home.as_view(), name='home')
-Including another URLconf
-    1. Import the include() function: from django.urls import include, path
-    2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
-"""
-from django.contrib import admin
-from django.urls import path, include
+from django.urls import path
+from .views import (
+    ArchivosJsonView, DetallesAdicionalesView, DetallesPorIdView, 
+    getUsers, createUser, userDetail, BrandListView, OffersByCategoryView,
+    BestPricesView, PriceComparisonView, RankedOffersView, TrendingOffersView,
+    StoreComparisonReportView, PriceAnalysisReportView
+)
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
-    path('api/', include('api.urls')),
+    path("user/", getUsers, name="get_user"),
+    path("user/create", createUser, name="create_user"),
+    path("user/<int:pk>/", userDetail, name="user_detail"),
+    path("archivos/", ArchivosJsonView.as_view(), name="archivos"),
+    path("archivos/detalles/", DetallesAdicionalesView.as_view(), name="detalles_all"),
+    path("archivos/<str:id>/detalles/", DetallesPorIdView.as_view(), name="detalles_por_id"),
+    path("brands/", BrandListView.as_view(), name="brand-list"),
+    path("offers/<str:category>/", OffersByCategoryView.as_view(), name="offers_by_category"),
+    
+    # Nuevas funcionalidades
+    path("best-prices/<str:category>/", BestPricesView.as_view(), name="best_prices"),
+    path("price-comparison/", PriceComparisonView.as_view(), name="price_comparison"),
+    path("ranked-offers/", RankedOffersView.as_view(), name="ranked_offers"),
+    path("trending-offers/", TrendingOffersView.as_view(), name="trending_offers"),
+    
+    # Reportes
+    path("reports/store-comparison/", StoreComparisonReportView.as_view(), name="store_comparison_report"),
+    path("reports/price-analysis/<str:category>/", PriceAnalysisReportView.as_view(), name="price_analysis_report"),
 ]

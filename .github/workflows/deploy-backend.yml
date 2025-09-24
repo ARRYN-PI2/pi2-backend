@@ -1,0 +1,90 @@
+name: Deploy Backend to EC2
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Setup SSH
+        uses: webfactory/ssh-agent@v0.7.0
+        with:
+          ssh-private-key: ${{ secrets.EC2_SSH_KEY }}
+          
+      - name: Add EC2 to known hosts
+        run: |
+          mkdir -p ~/.ssh
+          ssh-keyscan -H ${{ secrets.EC2_HOST }} >> ~/.ssh/known_hosts || echo "Warning: Could not add host to known_hosts"
+          
+      - name: Deploy to EC2
+        run: |
+          ssh -o StrictHostKeyChecking=no ${{ secrets.EC2_USERNAME }}@${{ secrets.EC2_HOST }} '
+            # Limpiar directorio si existe
+            sudo rm -rf /opt/arryn-backend
+            sudo mkdir -p /opt/arryn-backend
+            sudo chown ec2-user:ec2-user /opt/arryn-backend
+            cd /opt/arryn-backend
+            
+            # Clone repositorio
+            git clone https://github.com/ARRYN-PI2/pi2-backend.git .
+            git checkout main
+            
+            # Crear docker-compose.yml para Django
+            cat > docker-compose.yml << "COMPOSE_EOF"
+          version: "3.8"
+          services:
+            backend:
+              build: .
+              ports:
+                - "8000:8000"
+              environment:
+                - MONGODB_URL=${{ secrets.MONGODB_URL }}
+                - DJANGO_SETTINGS_MODULE=Arryn_Back.infrastructure.config.settings
+              restart: unless-stopped
+          COMPOSE_EOF
+            
+            # Crear Dockerfile para Django
+            cat > Dockerfile << "DOCKER_EOF"
+          FROM python:3.9-slim
+
+          WORKDIR /app
+
+          # Instalar dependencias del sistema
+          RUN apt-get update && apt-get install -y \
+              gcc \
+              && rm -rf /var/lib/apt/lists/*
+
+          # Copiar e instalar dependencias Python
+          COPY requirements.txt .
+          RUN pip install --no-cache-dir -r requirements.txt
+
+          # Copiar código
+          COPY . .
+
+          # Crear directorio para archivos estáticos
+          RUN mkdir -p /app/static
+
+          # Ejecutar migraciones y collectstatic
+          RUN python manage.py collectstatic --noinput || true
+
+          EXPOSE 8000
+
+          # Ejecutar servidor Django
+          CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
+          DOCKER_EOF
+            
+            # Ejecutar deployment
+            chmod +x ./deploy.sh
+            ./deploy.sh
+          '
+          
+      - name: Health Check
+        run: |
+          sleep 20
+          curl -f http://${{ secrets.EC2_HOST }}:8000/ || echo "Health check failed, but deployment completed"

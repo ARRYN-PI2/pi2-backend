@@ -1,9 +1,7 @@
-from django.urls import path
-from ..api.views import getUsers, createUser, userDetail, ArchivosJsonView
+from django.contrib import admin
+from django.urls import path, include
 
 urlpatterns = [
-    path('user/', getUsers, name='get_user'),
-    path('user/create', createUser, name='create_user'),
-    path('user/<int:pk>/', userDetail, name='user_detail'),
-    path("archivos/", ArchivosJsonView.as_view(), name="archivos"),
+    path("admin/", admin.site.urls),
+    path("api/", include("Arryn_Back.infrastructure.api.urls")),  # <- Aquí incluyes las urls de tu app
 ]
