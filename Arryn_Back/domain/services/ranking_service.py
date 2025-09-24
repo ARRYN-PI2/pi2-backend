@@ -36,7 +36,7 @@ class OfferRankingService:
             # Filtro base
             match_filter = {"precio_valor": {"$exists": True, "$ne": None}}
             if categoria:
-                match_filter["categoria"] = categoria
+                match_filter["categoria"] = {"$eq": categoria}
             
             pipeline = [
                 {"$match": match_filter},

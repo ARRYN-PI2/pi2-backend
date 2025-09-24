@@ -1,15 +1,27 @@
+import os
 from django.conf import settings
 from pymongo import MongoClient, ASCENDING
 from bson import ObjectId  # para manejar los IDs de Mongo
+from dotenv import load_dotenv
+
+# Load environment variables
+load_dotenv()
 
 try:
-    client = MongoClient("mongodb://localhost:27017/", serverSelectionTimeoutMS=5000)
+    # Configuration from environment variables
+    MONGO_HOST = os.getenv("MONGO_HOST", "localhost")
+    MONGO_PORT = int(os.getenv("MONGO_PORT", 27017))
+    MONGO_DB_NAME = os.getenv("MONGO_DB_NAME", "arryn_products_db")
+    MONGO_TIMEOUT = int(os.getenv("MONGO_CONNECTION_TIMEOUT", 5000))
+    
+    client = MongoClient(f"mongodb://{MONGO_HOST}:{MONGO_PORT}/", serverSelectionTimeoutMS=MONGO_TIMEOUT)
     # Test de conexión
     client.admin.command('ping')
-    db = client["mi_base_mongo"]
+    db = client[MONGO_DB_NAME]
     MONGO_AVAILABLE = True
+    print(f"✅ MongoDB conectado: {MONGO_HOST}:{MONGO_PORT}/{MONGO_DB_NAME}")
 except Exception as e:
-    print(f"MongoDB no disponible: {e}")
+    print(f"⚠️  MongoDB no disponible: {e}")
     db = None
     MONGO_AVAILABLE = False
 
@@ -93,7 +105,7 @@ def obtener_marcas(
     
     col = db[coleccion]
 
-    match = {"marca": {"$type": "string", "$ne": ""}}
+    match: dict = {"marca": {"$type": "string", "$ne": ""}}
     if fuente:
         match["fuente"] = fuente
     if categoria:

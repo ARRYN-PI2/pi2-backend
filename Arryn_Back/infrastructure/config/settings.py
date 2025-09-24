@@ -10,30 +10,45 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
+import os
 from pathlib import Path
+from dotenv import load_dotenv
 from pymongo import MongoClient
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+# Load environment variables
+env_path = BASE_DIR.parent.parent / '.env.dev'
+load_dotenv(env_path)
+
+# MongoDB Configuration from environment
 MONGO_DB = {
-    "NAME": "mi_db_mongo",
-    "HOST": "localhost",
-    "PORT": 27017,
+    "NAME": os.getenv("MONGO_DB_NAME", "arryn_products_db"),
+    "HOST": os.getenv("MONGO_HOST", "localhost"),
+    "PORT": int(os.getenv("MONGO_PORT", 27017)),
 }
 
-mongo_client = MongoClient(MONGO_DB["HOST"], MONGO_DB["PORT"])
-MONGO_DATABASE = mongo_client[MONGO_DB["NAME"]]
+try:
+    mongo_client = MongoClient(
+        MONGO_DB["HOST"], 
+        MONGO_DB["PORT"],
+        serverSelectionTimeoutMS=int(os.getenv("MONGO_CONNECTION_TIMEOUT", 5000))
+    )
+    MONGO_DATABASE = mongo_client[MONGO_DB["NAME"]]
+except Exception as e:
+    print(f"MongoDB connection warning: {e}")
+    MONGO_DATABASE = None
 
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-h1fb7!_l&5p9zj%qe!owaq!0yr&+ng3jm%^0m5p#7m4eaqq+yq'
+SECRET_KEY = os.getenv("SECRET_KEY", 'django-insecure-default-key-change-in-production')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.getenv("DEBUG", "True").lower() in ("true", "1", "yes")
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "localhost,127.0.0.1").split(",")
 
 
 # Application definition
@@ -65,10 +80,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-CORS_ALLOWED_ORIGINS = [
-    #"http://localhost:5173", Poner aca Frontend  
-    "http://127.0.0.1:5173"
-]
+CORS_ALLOWED_ORIGINS = os.getenv("CORS_ALLOWED_ORIGINS", "http://127.0.0.1:5173").split(",")
 
 
 
@@ -151,11 +163,11 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # Configuración para manejo de concurrencia alta
 CACHES = {
     'default': {
-        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
-        'LOCATION': 'unique-snowflake',
-        'TIMEOUT': 300,  # 5 minutos
+        'BACKEND': os.getenv("CACHE_BACKEND", 'django.core.cache.backends.locmem.LocMemCache'),
+        'LOCATION': os.getenv("CACHE_LOCATION", 'arryn-cache'),
+        'TIMEOUT': int(os.getenv("CACHE_TIMEOUT", 300)),  # 5 minutos por defecto
         'OPTIONS': {
-            'MAX_ENTRIES': 1000,
+            'MAX_ENTRIES': int(os.getenv("CACHE_MAX_ENTRIES", 1000)),
         }
     }
 }
@@ -179,13 +191,13 @@ LOGGING = {
     },
     'handlers': {
         'file': {
-            'level': 'INFO',
+            'level': os.getenv("LOG_LEVEL", "INFO"),
             'class': 'logging.FileHandler',
-            'filename': 'django.log',
+            'filename': os.getenv("LOG_FILE", "django.log"),
             'formatter': 'verbose',
         },
         'console': {
-            'level': 'INFO',
+            'level': os.getenv("LOG_LEVEL", "INFO"),
             'class': 'logging.StreamHandler',
             'formatter': 'verbose',
         },
@@ -193,12 +205,12 @@ LOGGING = {
     'loggers': {
         'django': {
             'handlers': ['file', 'console'],
-            'level': 'INFO',
+            'level': os.getenv("LOG_LEVEL", "INFO"),
             'propagate': True,
         },
         'arryn': {
             'handlers': ['file', 'console'],
-            'level': 'INFO',
+            'level': os.getenv("LOG_LEVEL", "INFO"),
             'propagate': True,
         },
     },

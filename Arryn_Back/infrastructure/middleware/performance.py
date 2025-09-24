@@ -1,6 +1,7 @@
 """
 Middleware personalizado para manejo de concurrencia alta
 """
+import os
 import time
 import hashlib
 from django.core.cache import cache
@@ -18,9 +19,9 @@ class RateLimitMiddleware(MiddlewareMixin):
     
     def __init__(self, get_response):
         self.get_response = get_response
-        # Configuración por defecto
-        self.rate_limit = 100  # requests por minuto
-        self.window_size = 60  # ventana de tiempo en segundos
+        # Configuración desde variables de entorno
+        self.rate_limit = int(os.getenv("RATE_LIMIT_REQUESTS", 100))  # requests por minuto
+        self.window_size = int(os.getenv("RATE_LIMIT_WINDOW", 60))  # ventana de tiempo en segundos
         super().__init__(get_response)
         
     def process_request(self, request):
@@ -81,7 +82,7 @@ class ResponseCacheMiddleware(MiddlewareMixin):
             '/api/trending-offers/',
             '/api/reports/'
         ]
-        self.cache_timeout = 300  # 5 minutos
+        self.cache_timeout = int(os.getenv("RESPONSE_CACHE_TIMEOUT", 300))  # 5 minutos por defecto
         super().__init__(get_response)
     
     def process_request(self, request):
@@ -147,8 +148,9 @@ class RequestLoggingMiddleware(MiddlewareMixin):
         if hasattr(request, 'start_time'):
             duration = time.time() - request.start_time
             
-            # Log requests lentos (más de 1 segundo)
-            if duration > 1.0:
+            # Log requests lentos (configurable desde .env)
+            slow_threshold = float(os.getenv("REQUEST_LOG_SLOW_THRESHOLD", 1.0))
+            if duration > slow_threshold:
                 logger.warning(
                     f"Slow request: {request.method} {request.path} "
                     f"took {duration:.2f}s - Status: {response.status_code}"

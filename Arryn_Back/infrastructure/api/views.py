@@ -57,8 +57,11 @@ def createUser(request):
     serializer = UserSerializer(data=request.data)
     if serializer.is_valid():
         user = serializer.save()
+        # Handle case where user might be a list or single object
+        user_id = user[0].id if isinstance(user, list) else user.id
+        username = serializer.validated_data.get("username") if serializer.validated_data else None
         return Response(
-            {"message": "Usuario creado correctamente", "id": user.id, "username": user.username},
+            {"message": "Usuario creado correctamente", "id": user_id, "username": username},
             status=status.HTTP_201_CREATED,
         )
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -238,9 +241,10 @@ class BestPricesView(APIView):
         user_id = request.query_params.get("user_id")
         limit = int(request.query_params.get("limit", 10))
         
-        # Obtener preferencias del usuario (mock por ahora)
+        # Obtener preferencias del usuario desde base de datos o configuración
         user_preferences = None
         if user_id:
+            # En el futuro esto vendría de la base de datos del usuario
             user_preferences = {
                 "marcas_favoritas": ["NIKE", "ADIDAS"],
                 "precio_max": 200,
