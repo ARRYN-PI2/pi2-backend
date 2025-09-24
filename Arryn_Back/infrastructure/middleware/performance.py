@@ -127,7 +127,7 @@ class ResponseCacheMiddleware(MiddlewareMixin):
     def generate_cache_key(self, request):
         """Genera una clave única para el cache"""
         url_with_params = request.get_full_path()
-        hash_key = hashlib.md5(url_with_params.encode('utf-8')).hexdigest()
+        hash_key = hashlib.blake2b(url_with_params.encode('utf-8')).hexdigest()
         return f"api_cache_{hash_key}"
 
 
