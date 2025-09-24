@@ -1,6 +1,5 @@
 # Multi-stage build para optimizar el tamaño de la imagen final
-# Imagen final de producción
-FROM python:3.12-slim
+FROM python:3.11-slim
 
 # Información del mantenedor
 LABEL maintainer="ARRYN Team <arryn@example.com>"
