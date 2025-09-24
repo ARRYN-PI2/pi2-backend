@@ -7,101 +7,74 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-
+    
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
-
+      
     - name: Setup SSH
       uses: webfactory/ssh-agent@v0.7.0
       with:
         ssh-private-key: ${{ secrets.EC2_SSH_KEY }}
-
-    - name: Add EC2 to known hosts
-      run: |
-        mkdir -p ~/.ssh
-        ssh-keyscan -H ${{ secrets.EC2_HOST }} >> ~/.ssh/known_hosts || echo "Warning: Could not add host to known_hosts"
-
+        
     - name: Deploy to EC2
       run: |
-        ssh -o StrictHostKeyChecking=no ${{ secrets.EC2_USERNAME }}@${{ secrets.EC2_HOST }} << 'DEPLOY_SCRIPT'
-          set -e
-
-          # Prerrequisitos
-          if ! command -v git >/dev/null 2>&1; then
-            sudo yum -y install git || sudo apt-get update && sudo apt-get -y install git
-          fi
-          if ! command -v docker >/dev/null 2>&1; then
-            curl -fsSL https://get.docker.com | sh
-            sudo systemctl enable --now docker
-            sudo usermod -aG docker $USER || true
-          fi
-          if ! docker compose version >/dev/null 2>&1; then
-            # Instalar docker-compose plugin si no está
-            DOCKER_CONFIG=${DOCKER_CONFIG:-$HOME/.docker}
-            mkdir -p "$DOCKER_CONFIG/cli-plugins"
-            curl -SL https://github.com/docker/compose/releases/download/v2.29.7/docker-compose-linux-x86_64 -o "$DOCKER_CONFIG/cli-plugins/docker-compose"
-            chmod +x "$DOCKER_CONFIG/cli-plugins/docker-compose"
-          fi
-
-          # Preparar directorio
-          sudo rm -rf /opt/arryn-backend
-          sudo mkdir -p /opt/arryn-backend
-          sudo chown $USER:$USER /opt/arryn-backend
-          cd /opt/arryn-backend
-
-          # Clonar código
-          git clone https://github.com/ARRYN-PI2/pi2-backend.git .
-          git checkout main || true
-
-          # Escribir archivo .env con secretos
-          cat > .env << 'EOF'
-        MONGODB_URL=${{ secrets.MONGODB_URL }}
-        DJANGO_SETTINGS_MODULE=arryn_backend.settings
-        EOF
-
-          # docker-compose.yml (usa env_file para cargar .env)
-          cat > docker-compose.yml << 'EOF'
-version: "3.8"
-services:
-  backend:
-    build: .
-    ports:
-      - "8000:8000"
-    env_file:
-      - .env
-    restart: unless-stopped
-      EOF
-      cat > Dockerfile << 'EOF'
-      FROM python:3.9-slim
-      WORKDIR /app
-      RUN apt-get update && apt-get install -y \
-          gcc \
-          && rm -rf /var/lib/apt/lists/*
-      COPY requirements.txt .
-      RUN pip install --no-cache-dir -r requirements.txt
-      COPY . .
-      RUN mkdir -p /app/static && \
-          python manage.py collectstatic --noinput || true
-      EXPOSE 8000
-      CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
-      EOF
-
-# Desplegar (docker compose v2 con fallback a v1)
-  # Desplegar (docker compose v2 con fallback a v1)
-  if docker compose version >/dev/null 2>&1; then
-  docker compose down || true
-  docker compose up -d --build
-  else
-  docker-compose down || true
-  docker-compose up -d --build
-  fi
-DEPLOY_SCRIPT
-
-- name: Health Check
-  run: |
-sleep 20
-curl -f http://${{ secrets.EC2_HOST }}:8000/ || echo "Health check failed, but deployment completed"
-run: |
-sleep 20
-curl -f http://${{ secrets.EC2_HOST }}:8000/ || echo "Health check failed, but deployment completed"
+        ssh -o StrictHostKeyChecking=no ${{ secrets.EC2_USERNAME }}@${{ secrets.EC2_HOST }} \
+        "sudo rm -rf /opt/arryn-backend && \
+         sudo mkdir -p /opt/arryn-backend && \
+         sudo chown ec2-user:ec2-user /opt/arryn-backend && \
+         cd /opt/arryn-backend && \
+         git clone https://github.com/ARRYN-PI2/pi2-backend.git . && \
+         git checkout main"
+         
+    - name: Create Docker files
+      run: |
+        ssh -o StrictHostKeyChecking=no ${{ secrets.EC2_USERNAME }}@${{ secrets.EC2_HOST }} \
+        "cd /opt/arryn-backend && \
+         echo 'MONGODB_URL=${{ secrets.MONGODB_URL }}' > .env && \
+         echo 'DJANGO_SETTINGS_MODULE=arryn_backend.settings' >> .env"
+         
+    - name: Create docker-compose.yml
+      run: |
+        ssh -o StrictHostKeyChecking=no ${{ secrets.EC2_USERNAME }}@${{ secrets.EC2_HOST }} \
+        "cd /opt/arryn-backend && \
+         cat > docker-compose.yml << 'EOF'
+        version: '3.8'
+        services:
+          backend:
+            build: .
+            ports:
+              - '8000:8000'
+            env_file:
+              - .env
+            restart: unless-stopped
+        EOF"
+        
+    - name: Create Dockerfile
+      run: |
+        ssh -o StrictHostKeyChecking=no ${{ secrets.EC2_USERNAME }}@${{ secrets.EC2_HOST }} \
+        "cd /opt/arryn-backend && \
+         cat > Dockerfile << 'EOF'
+        FROM python:3.9-slim
+        WORKDIR /app
+        RUN apt-get update && apt-get install -y gcc && rm -rf /var/lib/apt/lists/*
+        COPY requirements.txt .
+        RUN pip install --no-cache-dir -r requirements.txt
+        COPY . .
+        RUN mkdir -p /app/static
+        RUN python manage.py collectstatic --noinput || true
+        EXPOSE 8000
+        CMD [\"python\", \"manage.py\", \"runserver\", \"0.0.0.0:8000\"]
+        EOF"
+        
+    - name: Deploy with Docker
+      run: |
+        ssh -o StrictHostKeyChecking=no ${{ secrets.EC2_USERNAME }}@${{ secrets.EC2_HOST }} \
+        "cd /opt/arryn-backend && \
+         docker-compose down || true && \
+         docker-compose up -d --build"
+         
+    - name: Health Check
+      run: |
+        sleep 25
+        curl -f http://${{ secrets.EC2_HOST }}:8000/ || echo "Health check failed, but deployment completed"
