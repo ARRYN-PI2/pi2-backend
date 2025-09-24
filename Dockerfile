@@ -1,5 +1,6 @@
-# Usar Python 3.13 como imagen base
-FROM python:3.13-slim
+# Multi-stage build para optimizar el tamaño de la imagen final
+# Imagen final de producción
+FROM python:3.12-slim
 
 # Información del mantenedor
 LABEL maintainer="ARRYN Team <arryn@example.com>"

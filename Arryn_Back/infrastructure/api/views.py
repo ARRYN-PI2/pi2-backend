@@ -136,10 +136,6 @@ class BrandListView(APIView):
         categoria = request.query_params.get("categoria")
 
         try:
-            # Verificar conexión a MongoDB
-            if db is not None:
-                db.admin.command('ping')
-            
             brands, counts = obtener_marcas(
                 coleccion="archivos",
                 with_counts=with_counts,
@@ -184,9 +180,7 @@ class OffersByCategoryView(APIView):
             return Response({"error": "Parametro 'limit' inválido"}, status=status.HTTP_400_BAD_REQUEST)
 
         try:
-            # Verificar conexión a MongoDB
             if db is not None:
-                db.admin.command('ping')
                 collection = db[self.DEFAULT_COLLECTION]
             else:
                 raise Exception("MongoDB no disponible")
