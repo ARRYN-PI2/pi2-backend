@@ -18,9 +18,11 @@ from pymongo import MongoClient
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# Load environment variables
+# Load environment variables (only in development)
 env_path = BASE_DIR.parent.parent / '.env.dev'
-load_dotenv(env_path)
+# Only load .env file if DEBUG environment variable is not explicitly set
+if os.getenv('DEBUG') is None:
+    load_dotenv(env_path)
 
 # MongoDB Configuration from environment
 MONGO_DB = {
