@@ -26,7 +26,7 @@ load_dotenv(env_path)
 MONGO_DB = {
     "NAME": os.getenv("MONGO_DB_NAME", "arryn_products_db"),
     "HOST": os.getenv("MONGO_HOST", "localhost"),
-    "PORT": int(os.getenv("MONGO_PORT", 27017)),
+    "PORT": int(os.getenv("MONGO_PORT") or 27017),
 }
 
 try:
