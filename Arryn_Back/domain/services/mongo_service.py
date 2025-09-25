@@ -2,15 +2,12 @@ import os
 from django.conf import settings
 from pymongo import MongoClient, ASCENDING
 from bson import ObjectId  # para manejar los IDs de Mongo
-from dotenv import load_dotenv
-
-# Load environment variables
-load_dotenv()
 
 try:
     # Configuration from environment variables
     MONGO_HOST = os.getenv("MONGO_HOST", "localhost")
-    MONGO_PORT = int(os.getenv("MONGO_PORT", 27017))
+    mongo_port_str = os.getenv("MONGO_PORT", "27017").strip()
+    MONGO_PORT = int(mongo_port_str if mongo_port_str else "27017")
     MONGO_DB_NAME = os.getenv("MONGO_DB_NAME", "arryn_products_db")
     MONGO_TIMEOUT = int(os.getenv("MONGO_CONNECTION_TIMEOUT", 5000))
     MONGO_USER = os.getenv("MONGO_USER")
