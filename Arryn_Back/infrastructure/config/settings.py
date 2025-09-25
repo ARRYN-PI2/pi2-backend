@@ -42,7 +42,10 @@ try:
         if mongodb_url:
             mongo_client = MongoClient(
                 mongodb_url,
-                serverSelectionTimeoutMS=int(os.getenv("MONGO_CONNECTION_TIMEOUT", 10000))
+                serverSelectionTimeoutMS=int(os.getenv("MONGO_CONNECTION_TIMEOUT", 10000)),
+                ssl=True,
+                ssl_cert_reqs='CERT_NONE',  # Disable certificate verification for Docker
+                retryWrites=True
             )
         else:
             print("⚠️  No MongoDB configuration found (neither MONGO_HOST nor MONGODB_URL)")
