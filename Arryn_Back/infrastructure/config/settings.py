@@ -45,7 +45,6 @@ try:
                 serverSelectionTimeoutMS=int(os.getenv("MONGO_CONNECTION_TIMEOUT", 10000)),
                 tls=True,
                 tlsAllowInvalidCertificates=True,
-                tlsInsecure=True,
                 retryWrites=True,
                 maxPoolSize=1  # Reduce connection pool for Docker
             )
