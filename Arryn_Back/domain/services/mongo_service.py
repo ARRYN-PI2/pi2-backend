@@ -24,8 +24,7 @@ try:
             client = MongoClient(
                 mongodb_url,
                 serverSelectionTimeoutMS=MONGO_TIMEOUT,
-                ssl=True,
-                ssl_cert_reqs='CERT_NONE',  # Disable certificate verification for Docker
+                tlsAllowInvalidCertificates=True,  # Correct PyMongo option for Docker
                 retryWrites=True
             )
             print(f"✅ MongoDB Atlas conectado: {mongodb_url[:50]}...")

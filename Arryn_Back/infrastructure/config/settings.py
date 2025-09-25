@@ -43,8 +43,7 @@ try:
             mongo_client = MongoClient(
                 mongodb_url,
                 serverSelectionTimeoutMS=int(os.getenv("MONGO_CONNECTION_TIMEOUT", 10000)),
-                ssl=True,
-                ssl_cert_reqs='CERT_NONE',  # Disable certificate verification for Docker
+                tlsAllowInvalidCertificates=True,  # Correct PyMongo option for Docker
                 retryWrites=True
             )
         else:
