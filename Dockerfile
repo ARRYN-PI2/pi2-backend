@@ -29,7 +29,6 @@ WORKDIR /app
 
 # Copiar archivos de dependencias
 COPY requirements.txt .
-COPY .env.example .env
 
 # Instalar dependencias de Python
 RUN pip install --no-cache-dir --upgrade pip \
