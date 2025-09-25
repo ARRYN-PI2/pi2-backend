@@ -43,8 +43,11 @@ try:
             mongo_client = MongoClient(
                 mongodb_url,
                 serverSelectionTimeoutMS=int(os.getenv("MONGO_CONNECTION_TIMEOUT", 10000)),
-                tlsAllowInvalidCertificates=True,  # Correct PyMongo option for Docker
-                retryWrites=True
+                tls=True,
+                tlsAllowInvalidCertificates=True,
+                tlsInsecure=True,
+                retryWrites=True,
+                maxPoolSize=1  # Reduce connection pool for Docker
             )
         else:
             print("⚠️  No MongoDB configuration found (neither MONGO_HOST nor MONGODB_URL)")

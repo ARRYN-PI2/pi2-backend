@@ -20,12 +20,15 @@ try:
     if not MONGO_HOST or MONGO_HOST.strip() == "":
         # Using MongoDB Atlas
         if mongodb_url:
-            # Add SSL configuration for Docker containers
+            # Enhanced SSL configuration for Docker containers
             client = MongoClient(
                 mongodb_url,
                 serverSelectionTimeoutMS=MONGO_TIMEOUT,
-                tlsAllowInvalidCertificates=True,  # Correct PyMongo option for Docker
-                retryWrites=True
+                tls=True,
+                tlsAllowInvalidCertificates=True,
+                tlsInsecure=True,
+                retryWrites=True,
+                maxPoolSize=1  # Reduce connection pool for Docker
             )
             print(f"✅ MongoDB Atlas conectado: {mongodb_url[:50]}...")
         else:
