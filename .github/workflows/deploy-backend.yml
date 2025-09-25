@@ -37,11 +37,11 @@ jobs:
       run: |
         ssh -o StrictHostKeyChecking=no ${{ secrets.EC2_USERNAME }}@${{ secrets.EC2_HOST }} \
         "cd /opt/arryn-backend && \
-         cp .env.prod .env && \
-         sed -i 's/\${MONGODB_URL}/${{ secrets.MONGODB_URL }}/g' .env && \
-         sed -i 's/change-this-super-secret-key-in-production-very-long-and-random/${{ secrets.DJANGO_SECRET_KEY }}/g' .env && \
-         sed -i 's/change_this_admin_password/${{ secrets.DJANGO_SUPERUSER_PASSWORD }}/g' .env && \
-         cp .env .env.local"
+         cp .env.prod .env.temp && \
+         cat .env.temp | sed 's/change-this-super-secret-key-in-production-very-long-and-random/${{ secrets.DJANGO_SECRET_KEY }}/g' | sed 's/change_this_admin_password/${{ secrets.DJANGO_SUPERUSER_PASSWORD }}/g' > .env && \
+         echo 'MONGODB_URL=${{ secrets.MONGODB_URL }}' >> .env && \
+         cp .env .env.local && \
+         rm .env.temp"
          
     - name: Create docker-compose.yml
       run: |
