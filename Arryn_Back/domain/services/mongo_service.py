@@ -1,4 +1,5 @@
 import os
+import ssl
 from django.conf import settings
 from pymongo import MongoClient, ASCENDING
 from bson import ObjectId  # para manejar los IDs de Mongo
@@ -20,12 +21,12 @@ try:
     if not MONGO_HOST or MONGO_HOST.strip() == "":
         # Using MongoDB Atlas
         if mongodb_url:
-            # Enhanced SSL configuration for Docker containers
+            # Simplified SSL configuration for Docker + MongoDB Atlas
             client = MongoClient(
                 mongodb_url,
                 serverSelectionTimeoutMS=MONGO_TIMEOUT,
-                tls=True,
-                tlsAllowInvalidCertificates=True,
+                ssl=True,
+                ssl_cert_reqs=ssl.CERT_NONE,  # Disable certificate validation
                 retryWrites=True,
                 maxPoolSize=1  # Reduce connection pool for Docker
             )

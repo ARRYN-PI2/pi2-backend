@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
 import os
+import ssl
 from pathlib import Path
 from dotenv import load_dotenv
 from pymongo import MongoClient
@@ -43,8 +44,8 @@ try:
             mongo_client = MongoClient(
                 mongodb_url,
                 serverSelectionTimeoutMS=int(os.getenv("MONGO_CONNECTION_TIMEOUT", 10000)),
-                tls=True,
-                tlsAllowInvalidCertificates=True,
+                ssl=True,
+                ssl_cert_reqs=ssl.CERT_NONE,  # Disable certificate validation
                 retryWrites=True,
                 maxPoolSize=1  # Reduce connection pool for Docker
             )
