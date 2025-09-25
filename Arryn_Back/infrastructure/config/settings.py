@@ -194,6 +194,13 @@ CACHES = {
     }
 }
 
+# Always use locmem cache if Redis is configured but not available
+cache_backend = os.getenv("CACHE_BACKEND", 'django.core.cache.backends.locmem.LocMemCache')
+if 'redis' in cache_backend.lower():
+    # Override Redis with LocMem for production when Redis is not available
+    CACHES['default']['BACKEND'] = 'django.core.cache.backends.locmem.LocMemCache'
+    CACHES['default']['LOCATION'] = 'arryn-cache'
+
 # Session configuration para alta concurrencia
 SESSION_ENGINE = 'django.contrib.sessions.backends.cache'
 SESSION_CACHE_ALIAS = 'default'
