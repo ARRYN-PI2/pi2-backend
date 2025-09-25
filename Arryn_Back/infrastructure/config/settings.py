@@ -30,12 +30,33 @@ MONGO_DB = {
 }
 
 try:
-    mongo_client = MongoClient(
-        MONGO_DB["HOST"], 
-        MONGO_DB["PORT"],
-        serverSelectionTimeoutMS=int(os.getenv("MONGO_CONNECTION_TIMEOUT", 5000))
-    )
-    MONGO_DATABASE = mongo_client[MONGO_DB["NAME"]]
+    # Use MongoDB Atlas URL if MONGO_HOST is empty, otherwise use local config
+    mongo_host = os.getenv("MONGO_HOST", "localhost")
+    mongodb_url = os.getenv("MONGODB_URL")
+    
+    if not mongo_host or mongo_host.strip() == "":
+        # Using MongoDB Atlas
+        if mongodb_url:
+            mongo_client = MongoClient(
+                mongodb_url,
+                serverSelectionTimeoutMS=int(os.getenv("MONGO_CONNECTION_TIMEOUT", 10000))
+            )
+        else:
+            print("⚠️  No MongoDB configuration found (neither MONGO_HOST nor MONGODB_URL)")
+            mongo_client = None
+    else:
+        # Using local MongoDB
+        mongo_client = MongoClient(
+            MONGO_DB["HOST"], 
+            MONGO_DB["PORT"],
+            serverSelectionTimeoutMS=int(os.getenv("MONGO_CONNECTION_TIMEOUT", 5000))
+        )
+    
+    if mongo_client:
+        MONGO_DATABASE = mongo_client[MONGO_DB["NAME"]]
+    else:
+        MONGO_DATABASE = None
+        
 except Exception as e:
     print(f"MongoDB connection warning: {e}")
     MONGO_DATABASE = None
@@ -154,6 +175,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
 STATIC_URL = 'static/'
+STATIC_ROOT = BASE_DIR / 'staticfiles'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
