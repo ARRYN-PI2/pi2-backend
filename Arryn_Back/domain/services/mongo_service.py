@@ -13,18 +13,30 @@ try:
     MONGO_USER = os.getenv("MONGO_USER")
     MONGO_PASSWORD = os.getenv("MONGO_PASSWORD")
     MONGO_AUTH_DB = os.getenv("MONGO_AUTH_DB", MONGO_DB_NAME)
-
-    if MONGO_USER and MONGO_PASSWORD:
-        mongo_uri = f"mongodb://{MONGO_USER}:{MONGO_PASSWORD}@{MONGO_HOST}:{MONGO_PORT}/{MONGO_AUTH_DB}"
+    
+    # Use MongoDB Atlas URL if MONGO_HOST is empty, otherwise use local config
+    mongodb_url = os.getenv("MONGODB_URL")
+    
+    if not MONGO_HOST or MONGO_HOST.strip() == "":
+        # Using MongoDB Atlas
+        if mongodb_url:
+            client = MongoClient(mongodb_url, serverSelectionTimeoutMS=MONGO_TIMEOUT)
+            print(f"✅ MongoDB Atlas conectado: {mongodb_url[:50]}...")
+        else:
+            raise Exception("Neither MONGO_HOST nor MONGODB_URL configured")
     else:
-        mongo_uri = f"mongodb://{MONGO_HOST}:{MONGO_PORT}/"
+        # Using local MongoDB
+        if MONGO_USER and MONGO_PASSWORD:
+            mongo_uri = f"mongodb://{MONGO_USER}:{MONGO_PASSWORD}@{MONGO_HOST}:{MONGO_PORT}/{MONGO_AUTH_DB}"
+        else:
+            mongo_uri = f"mongodb://{MONGO_HOST}:{MONGO_PORT}/"
+        client = MongoClient(mongo_uri, serverSelectionTimeoutMS=MONGO_TIMEOUT)
+        print(f"✅ MongoDB conectado: {MONGO_HOST}:{MONGO_PORT}/{MONGO_DB_NAME}")
 
-    client = MongoClient(mongo_uri, serverSelectionTimeoutMS=MONGO_TIMEOUT)
     # Test de conexión
     client.admin.command('ping')
     db = client[MONGO_DB_NAME]
     MONGO_AVAILABLE = True
-    print(f"✅ MongoDB conectado: {MONGO_HOST}:{MONGO_PORT}/{MONGO_DB_NAME}")
 except Exception as e:
     print(f"⚠️  MongoDB no disponible: {e}")
     db = None
