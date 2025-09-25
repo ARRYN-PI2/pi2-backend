@@ -55,7 +55,7 @@ jobs:
             ports:
               - '8000:8000'
             env_file:
-              - .env.local
+              - .env
             restart: unless-stopped
         EOF"
         
