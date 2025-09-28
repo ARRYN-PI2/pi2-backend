@@ -12,8 +12,24 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 
 import os
 from pathlib import Path
-from dotenv import load_dotenv
+try:
+    from dotenv import load_dotenv  # type: ignore[import-not-found]
+except ModuleNotFoundError:  # pragma: no cover - optional dependency fallback
+    def load_dotenv(*_, **__):
+        """Fallback no-op when python-dotenv is not installed."""
+        return None
 from pymongo import MongoClient
+
+
+def get_env_list(env_name: str, default):
+    """Parse comma-separated environment variables into a clean list."""
+    raw = os.getenv(env_name)
+    if raw is None:
+        if isinstance(default, (list, tuple)):
+            raw = ",".join(default)
+        else:
+            raw = str(default)
+    return [item.strip() for item in raw.split(",") if item and item.strip()]
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -48,7 +64,16 @@ SECRET_KEY = os.getenv("SECRET_KEY", 'django-insecure-default-key-change-in-prod
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv("DEBUG", "True").lower() in ("true", "1", "yes")
 
-ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "localhost,127.0.0.1").split(",")
+ALLOWED_HOSTS = get_env_list(
+    "ALLOWED_HOSTS",
+    [
+        "localhost",
+        "127.0.0.1",
+        "avouruymc3.execute-api.us-east-2.amazonaws.com",
+        "www.learn-ia.app",
+        "learn-ia.app",
+    ],
+)
 
 
 # Application definition
@@ -80,7 +105,31 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-CORS_ALLOWED_ORIGINS = os.getenv("CORS_ALLOWED_ORIGINS", "http://127.0.0.1:5173").split(",")
+CORS_ALLOWED_ORIGINS = get_env_list(
+    "CORS_ALLOWED_ORIGINS",
+    [
+        "http://127.0.0.1:5173",
+        "https://www.learn-ia.app",
+        "https://learn-ia.app",
+    ],
+)
+
+CORS_ALLOW_CREDENTIALS = os.getenv("CORS_ALLOW_CREDENTIALS", "False").lower() in {"true", "1", "yes"}
+
+CORS_ALLOWED_ORIGIN_REGEXES = get_env_list(
+    "CORS_ALLOWED_ORIGIN_REGEXES",
+    [
+        r"^https://([a-z0-9-]+\.)?learn-ia\.app$",
+    ],
+)
+
+CSRF_TRUSTED_ORIGINS = get_env_list(
+    "CSRF_TRUSTED_ORIGINS",
+    [
+        "https://www.learn-ia.app",
+        "https://learn-ia.app",
+    ],
+)
 
 
 

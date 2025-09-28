@@ -2,7 +2,12 @@ import os
 from django.conf import settings
 from pymongo import MongoClient, ASCENDING
 from bson import ObjectId  # para manejar los IDs de Mongo
-from dotenv import load_dotenv
+
+try:
+    from dotenv import load_dotenv  # type: ignore[import-not-found]
+except ModuleNotFoundError:  # pragma: no cover - optional dependency fallback
+    def load_dotenv(*_, **__):
+        return None
 
 # Load environment variables
 load_dotenv()
