@@ -225,12 +225,42 @@ curl -X GET "http://localhost:8000/api/reports/store-comparison/?period_days=30"
 
 ## 🔧 Configuración
 
+### 🔒 Seguridad: SECRET_KEY
+
+**⚠️ IMPORTANTE:** El `SECRET_KEY` es obligatorio y debe ser único para cada entorno.
+
+#### Generar SECRET_KEY
+```bash
+# Opción 1: Usando Django (recomendado)
+python -c 'from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())'
+
+# Opción 2: Usando Python estándar
+python -c "import secrets; print(''.join(secrets.choice('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*(-_=+)') for _ in range(50)))"
+```
+
+#### Configurar SECRET_KEY
+```bash
+# Desarrollo (.env.dev)
+SECRET_KEY=tu-clave-generada-para-desarrollo
+
+# Producción (usar gestor de secretos o variables de entorno)
+export SECRET_KEY="tu-clave-generada-para-produccion"
+```
+
+**⚠️ Buenas Prácticas:**
+- ✅ Generar una clave única para cada entorno (dev, staging, production)
+- ✅ Nunca compartir el SECRET_KEY entre ambientes
+- ✅ Usar gestores de secretos en producción (AWS Secrets Manager, Azure Key Vault, etc.)
+- ✅ Rotar el SECRET_KEY periódicamente
+- ❌ NUNCA commitear el SECRET_KEY real al repositorio
+- ❌ NUNCA usar el mismo SECRET_KEY en desarrollo y producción
+
 ### Variables de Entorno (.env)
 
 ```bash
 # Django
 DEBUG=True
-SECRET_KEY=your-secret-key
+SECRET_KEY=GENERAR-CON-COMANDO-ARRIBA
 ALLOWED_HOSTS=localhost,127.0.0.1
 
 # MongoDB
