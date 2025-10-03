@@ -231,10 +231,13 @@ curl -X GET "http://localhost:8000/api/reports/store-comparison/?period_days=30"
 
 #### Generar SECRET_KEY
 ```bash
-# Opción 1: Usando Django (recomendado)
+# Opción 1: Usando el script proporcionado (más fácil)
+python scripts/generate_secret_key.py
+
+# Opción 2: Usando Django directamente
 python -c 'from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())'
 
-# Opción 2: Usando Python estándar
+# Opción 3: Usando Python estándar
 python -c "import secrets; print(''.join(secrets.choice('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*(-_=+)') for _ in range(50)))"
 ```
 
@@ -414,6 +417,28 @@ curl -f http://localhost:8000/api/brands/
 - [ ] Documentación actualizada
 - [ ] Variables de entorno documentadas
 - [ ] Docker build exitoso
+- [ ] SECRET_KEY no expuesto en el código
+
+## 🔐 Seguridad
+
+### Checklist de Seguridad para Despliegue
+
+Antes de desplegar a producción, verifica:
+
+- [ ] ✅ SECRET_KEY único generado para producción
+- [ ] ✅ SECRET_KEY almacenado de forma segura (no en código)
+- [ ] ✅ DEBUG=False en producción
+- [ ] ✅ ALLOWED_HOSTS configurado correctamente
+- [ ] ✅ HTTPS habilitado en producción
+- [ ] ✅ Variables sensibles en gestor de secretos
+- [ ] ✅ Logs configurados sin información sensible
+- [ ] ✅ Permisos de base de datos mínimos necesarios
+
+### Recursos de Seguridad
+
+- [Django Deployment Checklist](https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/)
+- [Django Security Settings](https://docs.djangoproject.com/en/5.2/topics/security/)
+- Script de generación: `python scripts/generate_secret_key.py`
 
 ## 📄 Licencia
 
