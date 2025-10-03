@@ -1,0 +1,402 @@
+{
+  "generated_at": "2025-09-28T06:29:17.809382Z",
+  "total_records": 16,
+  "records": [
+    {
+      "test": "Arryn_Back.tests.test_performance_middleware.RateLimitMiddlewareTests.test_allows_requests_within_limit",
+      "details": {
+        "ip": "127.0.0.1",
+        "within_limit": true,
+        "cache_entry": {
+          "count": 1,
+          "window_start": 1759040957.8016193
+        }
+      }
+    },
+    {
+      "test": "Arryn_Back.tests.test_performance_middleware.RateLimitMiddlewareTests.test_blocks_when_limit_exceeded",
+      "details": {
+        "ip": "127.0.0.1",
+        "response": {
+          "error": "Rate limit exceeded",
+          "limit": 2,
+          "window": 60,
+          "retry_after": 59
+        },
+        "cache_entry": {
+          "count": 3,
+          "window_start": 1759040957.8021648
+        }
+      }
+    },
+    {
+      "test": "Arryn_Back.tests.test_performance_middleware.RequestLoggingMiddlewareTests.test_logs_fast_requests",
+      "details": {
+        "path": "/api/test/",
+        "duration_seconds": 0.1,
+        "logged_message": "GET /api/test/ - 0.100s - Status: 200"
+      }
+    },
+    {
+      "test": "Arryn_Back.tests.test_performance_middleware.RequestLoggingMiddlewareTests.test_logs_slow_requests",
+      "details": {
+        "path": "/api/test/",
+        "duration_seconds": 2,
+        "logged_message": "Slow request: GET /api/test/ took 2.00s - Status: 200"
+      }
+    },
+    {
+      "test": "Arryn_Back.tests.test_performance_middleware.ResponseCacheMiddlewareTests.test_caches_successful_response",
+      "details": {
+        "path": "/api/best-prices/",
+        "cache_key": "cache-key",
+        "cached_value": {
+          "data": 42
+        }
+      }
+    },
+    {
+      "test": "Arryn_Back.tests.test_performance_middleware.ResponseCacheMiddlewareTests.test_returns_cached_response",
+      "details": {
+        "path": "/api/best-prices/",
+        "cache_key": "cache-key",
+        "returned_payload": {
+          "cached": true
+        }
+      }
+    },
+    {
+      "test": "Arryn_Back.tests.test_price_service.PricePersonalizationServiceTests.test_get_best_prices_by_category_applies_user_preferences",
+      "details": {
+        "categoria": "running",
+        "user_preferences": {
+          "marcas_favoritas": [
+            "NIKE"
+          ],
+          "precio_max": 150,
+          "precio_min": 100
+        },
+        "result": [
+          {
+            "_id": "68d8d5bd80148b662edbb628",
+            "titulo": "Zapatilla Running",
+            "marca": "NIKE",
+            "precio_valor": 120,
+            "precio_texto": "$120"
+          }
+        ],
+        "match_filter": {
+          "categoria": "running",
+          "precio_valor": {
+            "$exists": true,
+            "$ne": null,
+            "$lte": 150,
+            "$gte": 100
+          },
+          "marca": {
+            "$in": [
+              "NIKE"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "test": "Arryn_Back.tests.test_price_service.PricePersonalizationServiceTests.test_get_best_prices_by_category_returns_mock_when_mongo_unavailable",
+      "details": {
+        "scenario": "mongo_unavailable",
+        "categoria": "running",
+        "limit": 3,
+        "result_count": 3,
+        "sample": [
+          {
+            "_id": "mock_id_1",
+            "titulo": "Producto running 1",
+            "marca": "ADIDAS",
+            "precio_texto": "$95",
+            "precio_valor": 95,
+            "moneda": "USD",
+            "categoria": "running",
+            "imagen": "https://example.com/image1.jpg",
+            "link": "https://example.com/product1",
+            "fuente": "mock_store",
+            "fecha_extraccion": "2025-09-24",
+            "ahorro_estimado": 2
+          },
+          {
+            "_id": "mock_id_2",
+            "titulo": "Producto running 2",
+            "marca": "NIKE",
+            "precio_texto": "$90",
+            "precio_valor": 90,
+            "moneda": "USD",
+            "categoria": "running",
+            "imagen": "https://example.com/image2.jpg",
+            "link": "https://example.com/product2",
+            "fuente": "mock_store",
+            "fecha_extraccion": "2025-09-24",
+            "ahorro_estimado": 4
+          }
+        ]
+      }
+    },
+    {
+      "test": "Arryn_Back.tests.test_price_service.PricePersonalizationServiceTests.test_get_price_comparison_builds_summary",
+      "details": {
+        "product": "iPhone",
+        "price_range": {
+          "min": 80,
+          "max": 130,
+          "average": 110.0
+        },
+        "total_results": 3,
+        "best_deal": {
+          "_id": "tienda_a",
+          "precio_min": 80,
+          "precio_max": 120,
+          "precio_promedio": 95,
+          "count": 2,
+          "productos": [
+            {
+              "precio_valor": 80
+            },
+            {
+              "precio_valor": 120
+            }
+          ]
+        }
+      }
+    },
+    {
+      "test": "Arryn_Back.tests.test_ranking_service.OfferRankingServiceTests.test_get_trending_offers_rounds_scores",
+      "details": {
+        "result": {
+          "_id": "68d8d5bd80148b662edbb629",
+          "trending_score": 98.77,
+          "precio_promedio_encontrado": 250.68
+        },
+        "raw_values": {
+          "trending_score": 98.7654,
+          "precio_promedio_encontrado": 250.6789
+        }
+      }
+    },
+    {
+      "test": "Arryn_Back.tests.test_ranking_service.OfferRankingServiceTests.test_rank_offers_by_value_formats_scores",
+      "details": {
+        "result": {
+          "_id": "68d8d5bd80148b662edbb62a",
+          "titulo": "Oferta smart TV",
+          "score_total": 0.958,
+          "score_precio": 0.812,
+          "score_freshness": 0.912,
+          "ahorro_vs_promedio": 15.68,
+          "percentil_precio": 25.0
+        },
+        "raw_scores": {
+          "score_total": 0.95781,
+          "score_precio": 0.81234,
+          "score_freshness": 0.91234,
+          "ahorro_vs_promedio": 15.6789,
+          "percentil_precio": 24.987
+        }
+      }
+    },
+    {
+      "test": "Arryn_Back.tests.test_ranking_service.OfferRankingServiceTests.test_rank_offers_by_value_returns_mock_when_mongo_unavailable",
+      "details": {
+        "scenario": "mongo_unavailable",
+        "limit": 3,
+        "result_count": 3,
+        "sample": [
+          {
+            "_id": "mock_ranked_0",
+            "titulo": "Top Oferta electronics #0",
+            "marca": "NIKE",
+            "precio_texto": "$150",
+            "precio_valor": 150,
+            "moneda": "USD",
+            "categoria": "electronics",
+            "imagen": "https://example.com/ranked0.jpg",
+            "link": "https://example.com/ranked0",
+            "fuente": "mock_store",
+            "fecha_extraccion": "2025-09-24",
+            "score_total": 0.95,
+            "score_precio": 0.9,
+            "score_freshness": 1.0,
+            "ahorro_vs_promedio": 20,
+            "percentil_precio": 10
+          },
+          {
+            "_id": "mock_ranked_1",
+            "titulo": "Top Oferta electronics #1",
+            "marca": "ADIDAS",
+            "precio_texto": "$140",
+            "precio_valor": 140,
+            "moneda": "USD",
+            "categoria": "electronics",
+            "imagen": "https://example.com/ranked1.jpg",
+            "link": "https://example.com/ranked1",
+            "fuente": "mock_store",
+            "fecha_extraccion": "2025-09-24",
+            "score_total": 0.85,
+            "score_precio": 0.82,
+            "score_freshness": 1.0,
+            "ahorro_vs_promedio": 18,
+            "percentil_precio": 15
+          }
+        ]
+      }
+    },
+    {
+      "test": "Arryn_Back.tests.test_report_service.ReportServiceTests.test_generate_price_analysis_report_computes_percentiles",
+      "details": {
+        "categoria": "electronics",
+        "estadisticas_generales": {
+          "total_productos": 4,
+          "precio_promedio": 75.0,
+          "precio_minimo": 50,
+          "precio_maximo": 110,
+          "rango_precios": 60
+        },
+        "percentiles": {
+          "p25": 65.0,
+          "p50_mediana": 80.0,
+          "p75": 95.0,
+          "p90": 104.0
+        },
+        "distribucion_rangos": {
+          "economico": 1,
+          "medio": 1,
+          "premium": 2
+        }
+      }
+    },
+    {
+      "test": "Arryn_Back.tests.test_report_service.ReportServiceTests.test_generate_price_analysis_report_returns_error_when_no_data",
+      "details": {
+        "categoria": "unknown",
+        "error": "No se encontraron datos para la categor\u00eda unknown"
+      }
+    },
+    {
+      "test": "Arryn_Back.tests.test_report_service.ReportServiceTests.test_generate_store_comparison_report_aggregates_data",
+      "details": {
+        "days_back": 15,
+        "summary": {
+          "total_tiendas": 2,
+          "total_productos": 30,
+          "categoria_filtro": null,
+          "promedio_productos_por_tienda": 15.0
+        },
+        "rankings": {
+          "mejor_precio_promedio": {
+            "_id": "store_a",
+            "total_productos": 10,
+            "precio_promedio": 90.5,
+            "precio_min": 50,
+            "precio_max": 120,
+            "categorias": [
+              "electronics"
+            ],
+            "marcas": [
+              "NIKE"
+            ],
+            "ultima_actualizacion": "2025-09-20",
+            "total_categorias": 1,
+            "total_marcas": 1,
+            "rango_precios": 70
+          },
+          "mayor_variedad": {
+            "_id": "store_b",
+            "total_productos": 20,
+            "precio_promedio": 150.0,
+            "precio_min": 80,
+            "precio_max": 220,
+            "categorias": [
+              "electronics",
+              "fitness"
+            ],
+            "marcas": [
+              "ADIDAS",
+              "PUMA"
+            ],
+            "ultima_actualizacion": "2025-09-21",
+            "total_categorias": 2,
+            "total_marcas": 2,
+            "rango_precios": 140
+          },
+          "mas_actualizada": {
+            "_id": "store_b",
+            "total_productos": 20,
+            "precio_promedio": 150.0,
+            "precio_min": 80,
+            "precio_max": 220,
+            "categorias": [
+              "electronics",
+              "fitness"
+            ],
+            "marcas": [
+              "ADIDAS",
+              "PUMA"
+            ],
+            "ultima_actualizacion": "2025-09-21",
+            "total_categorias": 2,
+            "total_marcas": 2,
+            "rango_precios": 140
+          }
+        },
+        "stores": [
+          {
+            "_id": "store_a",
+            "total_productos": 10,
+            "precio_promedio": 90.5,
+            "precio_min": 50,
+            "precio_max": 120,
+            "categorias": [
+              "electronics"
+            ],
+            "marcas": [
+              "NIKE"
+            ],
+            "ultima_actualizacion": "2025-09-20",
+            "total_categorias": 1,
+            "total_marcas": 1,
+            "rango_precios": 70
+          },
+          {
+            "_id": "store_b",
+            "total_productos": 20,
+            "precio_promedio": 150.0,
+            "precio_min": 80,
+            "precio_max": 220,
+            "categorias": [
+              "electronics",
+              "fitness"
+            ],
+            "marcas": [
+              "ADIDAS",
+              "PUMA"
+            ],
+            "ultima_actualizacion": "2025-09-21",
+            "total_categorias": 2,
+            "total_marcas": 2,
+            "rango_precios": 140
+          }
+        ]
+      }
+    },
+    {
+      "test": "Arryn_Back.tests.test_report_service.ReportServiceTests.test_generate_store_comparison_report_returns_mock_when_mongo_unavailable",
+      "details": {
+        "categoria": "electronics",
+        "resumen": {
+          "total_tiendas": 3,
+          "total_productos": 150,
+          "categoria_filtro": "electronics",
+          "promedio_productos_por_tienda": 50
+        }
+      }
+    }
+  ]
+}
