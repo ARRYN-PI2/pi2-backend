@@ -81,3 +81,7 @@ INFO 2025-09-24 06:39:36,669 performance 24782 139966768207552 Cached response f
 INFO 2025-09-24 06:39:36,669 basehttp 24782 139966768207552 "GET /api/trending-offers/?limit=1 HTTP/1.1" 200 514
 INFO 2025-09-24 06:40:57,184 autoreload 24782 139967334219520 /home/raul/Documents/Pi2Camilo/Repositorios/pi2-backend/Arryn_Back/infrastructure/api/views.py changed, reloading.
 INFO 2025-09-24 06:40:57,571 autoreload 25646 140017008070400 Watching for file changes with StatReloader
+INFO 2025-10-05 18:27:36,891 autoreload 20356 140460427792128 Watching for file changes with StatReloader
+INFO 2025-10-05 18:27:56,290 autoreload 20356 140460427792128 /home/raul/Documents/Pi2Camilo/Repositorios/pi2-backend/Arryn_Back/infrastructure/config/settings.py changed, reloading.
+INFO 2025-10-05 18:27:56,887 autoreload 20855 140052533399296 Watching for file changes with StatReloader
+INFO 2025-10-05 18:28:47,665 autoreload 22224 140272690740992 Watching for file changes with StatReloader
