@@ -142,32 +142,32 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'Arryn_Back.infrastructure.config.wsgi.application'
 
-
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
-# Database configuration from environment variables
-DATABASE_ENGINE = os.getenv("DATABASE_ENGINE", "django.db.backends.sqlite3")
+POSTGRES_ENABLED = os.getenv("POSTGRES_ENABLED", "False").lower() in ("true", "1", "yes")
 
-if DATABASE_ENGINE == "django.db.backends.postgresql":
+if POSTGRES_ENABLED:
     DATABASES = {
-        'default': {
-            'ENGINE': DATABASE_ENGINE,
-            'NAME': os.getenv("DATABASE_NAME", "postgres"),
-            'USER': os.getenv("DATABASE_USER", "postgres"),
-            'PASSWORD': os.getenv("DATABASE_PASSWORD", "postgres"),
-            'HOST': os.getenv("DATABASE_HOST", "localhost"),
-            'PORT': os.getenv("DATABASE_PORT", "5432"),
+        "default": {
+            "ENGINE": "django.db.backends.postgresql",
+            "NAME": os.getenv("POSTGRES_DB", "postgres"),
+            "USER": os.getenv("POSTGRES_USER", "postgres"),
+            "PASSWORD": os.getenv("POSTGRES_PASSWORD", ""),
+            "HOST": os.getenv("POSTGRES_HOST", "localhost"),
+            "PORT": os.getenv("POSTGRES_PORT", "5432"),
+            "CONN_MAX_AGE": int(os.getenv("POSTGRES_CONN_MAX_AGE", "0")),
+            "OPTIONS": ({ "sslmode": os.getenv("POSTGRES_SSLMODE") } if os.getenv("POSTGRES_SSLMODE") else {}),
         }
     }
 else:
-    # SQLite configuration (default)
     DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': BASE_DIR / os.getenv("DATABASE_NAME", "db.sqlite3"),
+        "default": {
+            "ENGINE": "django.db.backends.sqlite3",
+            "NAME": BASE_DIR / os.getenv("DATABASE_NAME", "db.sqlite3"),
         }
     }
+
 
 AUTH_USER_MODEL = 'api.User'
 
