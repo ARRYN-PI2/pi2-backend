@@ -118,6 +118,32 @@ MIDDLEWARE = [
 
 CORS_ALLOWED_ORIGINS = os.getenv("CORS_ALLOWED_ORIGINS", "http://127.0.0.1:5173").split(",")
 
+# Configuraciones adicionales de CORS para producción
+CORS_ALLOW_CREDENTIALS = True
+CORS_ALLOW_HEADERS = [
+    'accept',
+    'accept-encoding',
+    'authorization',
+    'content-type',
+    'dnt',
+    'origin',
+    'user-agent',
+    'x-csrftoken',
+    'x-requested-with',
+]
+CORS_ALLOW_METHODS = [
+    'DELETE',
+    'GET',
+    'OPTIONS',
+    'PATCH',
+    'POST',
+    'PUT',
+]
+
+# En desarrollo, permitir todos los orígenes (comentar en producción)
+if DEBUG:
+    CORS_ALLOW_ALL_ORIGINS = True
+
 
 
 ROOT_URLCONF = 'Arryn_Back.infrastructure.config.urls'
