@@ -8,7 +8,14 @@ from pymongo import ASCENDING
 
 from .models import User
 from .serializer import UserSerializer
-from ...domain.services.mongo_service import guardar_json, obtener_json, obtener_por_id, obtener_marcas, db
+from ...domain.services.mongo_service import (
+    guardar_json,
+    obtener_json,
+    obtener_por_id,
+    obtener_marcas,
+    obtener_categorias,
+    db,
+)
 from ...domain.services.parse_details import parse_details
 from ...domain.services.price_service import PricePersonalizationService
 from ...domain.services.ranking_service import OfferRankingService
@@ -160,6 +167,23 @@ class BrandListView(APIView):
         if with_counts:
             payload["counts"] = counts
         return Response(payload, status=status.HTTP_200_OK)
+
+class CategoryListView(APIView):
+    def get(self, request):
+        try:
+            categories = obtener_categorias("archivos")
+            return Response(
+                {
+                    "count": len(categories),
+                    "categories": categories,
+                },
+                status=status.HTTP_200_OK,
+            )
+        except Exception as e:
+            return Response(
+                {"error": f"Error obteniendo categorías: {e}"},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )
 
 
 class OffersByCategoryView(APIView):

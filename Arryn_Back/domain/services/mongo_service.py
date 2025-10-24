@@ -163,3 +163,52 @@ def obtener_marcas(
     data = list(col.aggregate(pipeline))
     brands = [d["marca"] for d in data]
     return brands, {}
+
+
+def obtener_categorias(
+    coleccion: str,
+) -> list[str]:
+    """
+    Retorna lista de categorías distintas ordenadas alfabéticamente.
+    Normaliza valores repetidos por diferencias de mayúsculas/minúsculas.
+    """
+    if not MONGO_AVAILABLE or db is None:
+        return [
+            "Smart TV",
+            "Celulares",
+            "Laptops",
+            "Audio",
+            "Gaming",
+        ]
+
+    col = db[coleccion]
+    pipeline = [
+        {
+            "$match": {
+                "categoria": {"$type": "string", "$ne": ""},
+            }
+        },
+        {
+            "$project": {
+                "categoria_original": "$categoria",
+                "categoria_normalizada": {
+                    "$trim": {
+                        "input": {
+                            "$toLower": "$categoria",
+                        }
+                    }
+                },
+            }
+        },
+        {
+            "$group": {
+                "_id": "$categoria_normalizada",
+                "categoria": {"$first": "$categoria_original"},
+            }
+        },
+        {"$match": {"categoria": {"$ne": None, "$ne": ""}}},
+        {"$sort": {"categoria": 1}},
+        {"$project": {"_id": 0, "categoria": "$categoria"}},
+    ]
+    data = list(col.aggregate(pipeline))
+    return [d["categoria"] for d in data]

@@ -1,9 +1,20 @@
 from django.urls import path
 from .views import (
-    ArchivosJsonView, DetallesAdicionalesView, DetallesPorIdView, 
-    getUsers, createUser, userDetail, BrandListView, OffersByCategoryView,
-    BestPricesView, PriceComparisonView, RankedOffersView, TrendingOffersView,
-    StoreComparisonReportView, PriceAnalysisReportView
+    ArchivosJsonView,
+    DetallesAdicionalesView,
+    DetallesPorIdView,
+    getUsers,
+    createUser,
+    userDetail,
+    BrandListView,
+    CategoryListView,
+    OffersByCategoryView,
+    BestPricesView,
+    PriceComparisonView,
+    RankedOffersView,
+    TrendingOffersView,
+    StoreComparisonReportView,
+    PriceAnalysisReportView,
 )
 
 urlpatterns = [
@@ -14,6 +25,7 @@ urlpatterns = [
     path("archivos/detalles/", DetallesAdicionalesView.as_view(), name="detalles_all"),
     path("archivos/<str:id>/detalles/", DetallesPorIdView.as_view(), name="detalles_por_id"),
     path("brands/", BrandListView.as_view(), name="brand-list"),
+    path("categories/", CategoryListView.as_view(), name="category-list"),
     path("offers/<str:category>/", OffersByCategoryView.as_view(), name="offers_by_category"),
     
     # Nuevas funcionalidades
