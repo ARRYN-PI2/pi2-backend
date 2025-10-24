@@ -97,3 +97,6 @@ volumes:
 networks:
   arryn-network:
     driver: bridge
+
+    env_file:
+      - .env
