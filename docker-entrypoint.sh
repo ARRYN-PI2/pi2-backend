@@ -21,7 +21,7 @@ wait_for_mongo() {
 run_migrations() {
     log "Ejecutando migraciones de base de datos..."
     python manage.py makemigrations --noinput
-    python manage.py migrate --noinput
+    python manage.py migrate --fake-initial --noinput
     log "✅ Migraciones completadas"
 }
 
