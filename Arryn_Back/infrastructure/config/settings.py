@@ -233,7 +233,7 @@ if 'redis' in cache_backend.lower():
     CACHES['default']['LOCATION'] = 'arryn-cache'
 
 # Session configuration para alta concurrencia
-SESSION_ENGINE = 'django.contrib.sessions.backends.cache'
+SESSION_ENGINE = 'django.contrib.sessions.backends.db'
 SESSION_CACHE_ALIAS = 'default'
 
 # Database connection configuration para SQLite
